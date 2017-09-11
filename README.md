@@ -1,5 +1,7 @@
 # [**@ladjs/mongoose**](https://github.com/ladjs/mongoose)
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/ladjs/mongoose.svg)](https://greenkeeper.io/)
+
 [![build status](https://img.shields.io/travis/ladjs/mongoose.svg)](https://travis-ci.org/ladjs/mongoose)
 [![code coverage](https://img.shields.io/codecov/c/github/ladjs/mongoose.svg)](https://codecov.io/gh/ladjs/mongoose)
 [![code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
