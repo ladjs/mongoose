@@ -1,9 +1,9 @@
+const debug = require('debug')('@ladjs/mongoose');
 const mongoose = require('mongoose');
 const delay = require('delay');
-const stopAgenda = require('stop-agenda');
 
 class Mongoose {
-  constructor(config) {
+  constructor(config = {}) {
     this.config = Object.assign(
       {
         agenda: false,
@@ -13,8 +13,7 @@ class Mongoose {
         reconnectMs: 3000,
         Promise: global.Promise,
         logger: console,
-        mongo: {},
-        stopAgenda: {}
+        mongo: {}
       },
       config
     );
@@ -56,7 +55,7 @@ class Mongoose {
     // if agenda was defined then ensure its a valid agenda instance
     if (this.agenda) {
       if (typeof this.config.agendaCollectionName !== 'string')
-        throw new Error('agneda collection name must be a String');
+        throw new Error('agenda collection name must be a String');
 
       if (!Array.isArray(this.config.agendaRecurringJobs))
         throw new Error('agenda recurring jobs must be an Array');
@@ -83,9 +82,7 @@ class Mongoose {
         resolve();
       } catch (err) {
         this.logger.error(err);
-        this.logger.info(
-          `attempting to reconnect in (${this.config.reconnectMs}) ms`
-        );
+        debug(`attempting to reconnect in (${this.config.reconnectMs}) ms`);
         await delay(this.config.reconnectMs);
         resolve(this.reconnect());
       }
@@ -93,7 +90,7 @@ class Mongoose {
   }
 
   connected() {
-    this.logger.info(`mongoose connection open to ${this.config.mongo.url}`);
+    debug(`mongoose connection open to ${this.config.mongo.url}`);
 
     // When the connection is connected we need to override
     // the default connection event, because agenda requires
@@ -106,9 +103,7 @@ class Mongoose {
       mongoose.connection.collection(this.config.agendaCollectionName).conn.db,
       this.config.agendaCollectionName,
       err => {
-        if (err) {
-          return this.logger.error(err);
-        }
+        if (err) return this.logger.error(err);
 
         // we need to redefine the recurring jobs here
         // and it has to be inside `agenda.mongo` because
@@ -123,35 +118,20 @@ class Mongoose {
               );
             if (typeof def[1] !== 'string')
               throw new Error('recurring job definition name must be a String');
-            this.logger.debug(
-              `scheduling every ${def[0]} the job named ${def[1]}`
-            );
+            debug(`scheduling every ${def[0]} the job named ${def[1]}`);
             this.agenda.every.apply(this.agenda, def);
           });
         }
 
         // start accepting new jobs
         this.agenda.maxConcurrency(this.agendaMaxConcurrency);
-        this.logger.info(
-          'agenda opened connection using existing mongoose connection'
-        );
+        debug('agenda opened connection using existing mongoose connection');
       }
     );
   }
 
   disconnected() {
-    this.logger.info('mongoose disconnected');
-
-    if (!this.agenda) return;
-
-    // Similarly when disconnected, we need to ensure that we stop agenda
-    stopAgenda(this.config.stopAgenda)
-      .then(() => {
-        this.logger.info(
-          'gracefully stopped agenda due to mongoose disconnect'
-        );
-      })
-      .catch(this.logger.error);
+    debug('mongoose disconnected');
   }
 }
 

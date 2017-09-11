@@ -12,9 +12,9 @@
     "Alexis Tyler <xo@wvvw.me> (https://wvvw.me/)"
   ],
   "dependencies": {
+    "debug": "^3.0.1",
     "delay": "^2.0.0",
-    "mongoose": "^4.11.11",
-    "stop-agenda": "^0.0.3"
+    "mongoose": "^4.11.11"
   },
   "devDependencies": {
     "ava": "^0.22.0",
