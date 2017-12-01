@@ -8,13 +8,13 @@
     "email": "niftylettuce@gmail.com"
   },
   "contributors": [
-    "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com)",
-    "Alexis Tyler <xo@wvvw.me> (https://wvvw.me/)"
+    "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com)"
   ],
   "dependencies": {
+    "boolean": "^0.1.3",
     "debug": "^3.0.1",
     "delay": "^2.0.0",
-    "mongoose": "^4.11.11"
+    "mongoose": "^4.13.5"
   },
   "devDependencies": {
     "ava": "^0.22.0",
