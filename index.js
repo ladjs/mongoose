@@ -68,7 +68,7 @@ mongoose.connect = (uri, options) => {
     try {
       await mongoose._connect(uri, options);
       // output debug info
-      mongoose.config.logger.info('mongo connected');
+      mongoose.config.logger.debug('mongo connected');
       resolve();
     } catch (err) {
       mongoose.config._connectionAttempts++;
