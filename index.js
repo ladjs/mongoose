@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 const delay = require('delay');
 const boolean = require('boolean');
 
+// set promise library
+// this is useful to have here in case we `require`
+// other packages using mongoose before calling `.configure()`
+// (this can be removed when we use `mongoose@5.x`)
+mongoose.Promise = global.Promise;
+
 mongoose.configure = config => {
   mongoose.config = Object.assign(
     {
