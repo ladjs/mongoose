@@ -2,12 +2,6 @@ const mongoose = require('mongoose');
 const delay = require('delay');
 const boolean = require('boolean');
 
-// set promise library
-// this is useful to have here in case we `require`
-// other packages using mongoose before calling `.configure()`
-// (this can be removed when we use `mongoose@5.x`)
-mongoose.Promise = global.Promise;
-
 mongoose.configure = config => {
   mongoose.config = Object.assign(
     {
@@ -16,7 +10,6 @@ mongoose.configure = config => {
       debug: process.env.MONGOOSE_DEBUG
         ? boolean(process.env.MONGOOSE_DEBUG)
         : false,
-      Promise: global.Promise,
       logger: console,
       mongo: {},
       _connectionAttempts: 0
@@ -47,9 +40,6 @@ mongoose.configure = config => {
 
   // set debug flag
   mongoose.set('debug', mongoose.config.debug);
-
-  // set promise library
-  mongoose.Promise = mongoose.config.Promise;
 
   // when the connection is connected
   mongoose.connection.on('connected', mongoose.connected);
