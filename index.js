@@ -27,7 +27,6 @@ mongoose.configure = config => {
 
   mongoose.config.mongo.options = Object.assign(
     {
-      useMongoClient: true,
       reconnectTries: process.env.MONGO_RECONNECT_TRIES
         ? parseInt(process.env.MONGO_RECONNECT_TRIES, 10)
         : Number.MAX_VALUE,
