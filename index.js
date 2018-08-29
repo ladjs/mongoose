@@ -32,7 +32,8 @@ mongoose.configure = config => {
         : Number.MAX_VALUE,
       reconnectInterval: process.env.MONGO_RECONNECT_INTERVAL
         ? parseInt(process.env.MONGO_RECONNECT_INTERVAL, 10)
-        : 1000
+        : 1000,
+      useNewUrlParser: true
     },
     mongoose.config.mongo.options
   );
