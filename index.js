@@ -3,40 +3,34 @@ const delay = require('delay');
 const boolean = require('boolean');
 
 mongoose.configure = config => {
-  mongoose.config = Object.assign(
-    {
-      agenda: false,
-      agendaCollectionName: process.env.AGENDA_COLLECTION_NAME || 'jobs',
-      debug: process.env.MONGOOSE_DEBUG
-        ? boolean(process.env.MONGOOSE_DEBUG)
-        : false,
-      logger: console,
-      mongo: {},
-      _connectionAttempts: 0
-    },
-    config
-  );
+  mongoose.config = {
+    agenda: false,
+    agendaCollectionName: process.env.AGENDA_COLLECTION_NAME || 'jobs',
+    debug: process.env.MONGOOSE_DEBUG
+      ? boolean(process.env.MONGOOSE_DEBUG)
+      : false,
+    logger: console,
+    mongo: {},
+    _connectionAttempts: 0,
+    ...config
+  };
 
-  mongoose.config.mongo = Object.assign(
-    {
-      uri: process.env.MONGO_URI || 'mongodb://localhost:27017/test',
-      options: {}
-    },
-    mongoose.config.mongo
-  );
+  mongoose.config.mongo = {
+    uri: process.env.MONGO_URI || 'mongodb://localhost:27017/test',
+    options: {},
+    ...mongoose.config.mongo
+  };
 
-  mongoose.config.mongo.options = Object.assign(
-    {
-      reconnectTries: process.env.MONGO_RECONNECT_TRIES
-        ? parseInt(process.env.MONGO_RECONNECT_TRIES, 10)
-        : Number.MAX_VALUE,
-      reconnectInterval: process.env.MONGO_RECONNECT_INTERVAL
-        ? parseInt(process.env.MONGO_RECONNECT_INTERVAL, 10)
-        : 1000,
-      useNewUrlParser: true
-    },
-    mongoose.config.mongo.options
-  );
+  mongoose.config.mongo.options = {
+    reconnectTries: process.env.MONGO_RECONNECT_TRIES
+      ? parseInt(process.env.MONGO_RECONNECT_TRIES, 10)
+      : Number.MAX_VALUE,
+    reconnectInterval: process.env.MONGO_RECONNECT_INTERVAL
+      ? parseInt(process.env.MONGO_RECONNECT_INTERVAL, 10)
+      : 1000,
+    useNewUrlParser: true,
+    ...mongoose.config.mongo.options
+  };
 
   // set debug flag
   mongoose.set('debug', mongoose.config.debug);
@@ -57,32 +51,30 @@ mongoose.configure = config => {
 };
 
 mongoose._connect = mongoose.connect;
-mongoose.connect = (uri, options) => {
+mongoose.connect = async (uri, options) => {
   uri = uri || mongoose.config.mongo.uri;
   options = options || mongoose.config.mongo.options;
-  return new Promise(async (resolve, reject) => {
-    try {
-      await mongoose._connect(uri, options);
-      // output debug info
-      mongoose.config.logger.debug('mongo connected');
-      resolve();
-    } catch (err) {
-      mongoose.config._connectionAttempts++;
-      if (
-        mongoose.config._connectionAttempts >=
-        mongoose.config.mongo.options.reconnectTries
-      )
-        return reject(err);
-      mongoose.config.logger.warn(
-        `attempting to reconnect to mongo in ${
-          mongoose.config.mongo.options.reconnectInterval
-        } ms with ${mongoose.config.mongo.options.reconnectTries -
-          mongoose.config._connectionAttempts} retries remaining`
-      );
-      await delay(mongoose.config.mongo.options.reconnectInterval);
-      resolve(mongoose.connect());
-    }
-  });
+  try {
+    await mongoose._connect(uri, options);
+    // output debug info
+    mongoose.config.logger.debug('mongo connected');
+    return;
+  } catch (err) {
+    mongoose.config._connectionAttempts++;
+    if (
+      mongoose.config._connectionAttempts >=
+      mongoose.config.mongo.options.reconnectTries
+    )
+      throw err;
+    mongoose.config.logger.warn(
+      `attempting to reconnect to mongo in ${
+        mongoose.config.mongo.options.reconnectInterval
+      } ms with ${mongoose.config.mongo.options.reconnectTries -
+        mongoose.config._connectionAttempts} retries remaining`
+    );
+    await delay(mongoose.config.mongo.options.reconnectInterval);
+    return mongoose.connect();
+  }
 };
 
 if (typeof mongoose.connected !== 'function')
@@ -125,16 +117,17 @@ if (typeof mongoose.connected !== 'function')
   };
 
 if (typeof mongoose.disconnected !== 'function')
-  mongoose.disconnected = () => {
+  mongoose.disconnected = async () => {
     // stop accepting new jobs
     if (mongoose.config.agenda) mongoose.config.agenda.maxConcurrency(0);
     // output debug info
     mongoose.config.logger.error('mongoose disconnected');
     // attempt to reconnect
-    mongoose
-      .connect()
-      .then()
-      .catch(mongoose.config.logger.error);
+    try {
+      await mongoose.connect();
+    } catch (err) {
+      mongoose.config.logger.error(err);
+    }
   };
 
 module.exports = mongoose;
