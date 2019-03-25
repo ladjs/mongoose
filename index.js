@@ -10,30 +10,28 @@ mongoose.configure = config => {
       ? boolean(process.env.MONGOOSE_DEBUG)
       : false,
     logger: console,
-    mongo: {},
+    mongo: {
+      uri: process.env.MONGO_URI || 'mongodb://localhost:27017/test',
+      options: {
+        reconnectTries: process.env.MONGO_RECONNECT_TRIES
+          ? parseInt(process.env.MONGO_RECONNECT_TRIES, 10)
+          : Number.MAX_VALUE,
+        reconnectInterval: process.env.MONGO_RECONNECT_INTERVAL
+          ? parseInt(process.env.MONGO_RECONNECT_INTERVAL, 10)
+          : 1000,
+        useNewUrlParser: true
+      }
+    },
+    useCreateIndex: true,
     _connectionAttempts: 0,
     ...config
   };
 
-  mongoose.config.mongo = {
-    uri: process.env.MONGO_URI || 'mongodb://localhost:27017/test',
-    options: {},
-    ...mongoose.config.mongo
-  };
-
-  mongoose.config.mongo.options = {
-    reconnectTries: process.env.MONGO_RECONNECT_TRIES
-      ? parseInt(process.env.MONGO_RECONNECT_TRIES, 10)
-      : Number.MAX_VALUE,
-    reconnectInterval: process.env.MONGO_RECONNECT_INTERVAL
-      ? parseInt(process.env.MONGO_RECONNECT_INTERVAL, 10)
-      : 1000,
-    useNewUrlParser: true,
-    ...mongoose.config.mongo.options
-  };
+  // if `useCreateIndex` was set as an option then use it
+  mongoose.set('useCreateIndex', boolean(mongoose.config.useCreateIndex));
 
   // set debug flag
-  mongoose.set('debug', mongoose.config.debug);
+  mongoose.set('debug', boolean(mongoose.config.debug));
 
   // when the connection is connected
   mongoose.connection.on('connected', mongoose.connected);
@@ -59,13 +57,13 @@ mongoose.connect = async (uri, options) => {
     // output debug info
     mongoose.config.logger.debug('mongo connected');
     return;
-  } catch (err) {
+  } catch (error) {
     mongoose.config._connectionAttempts++;
     if (
       mongoose.config._connectionAttempts >=
       mongoose.config.mongo.options.reconnectTries
     )
-      throw err;
+      throw error;
     mongoose.config.logger.warn(
       `attempting to reconnect to mongo in ${
         mongoose.config.mongo.options.reconnectInterval
@@ -125,8 +123,8 @@ if (typeof mongoose.disconnected !== 'function')
     // attempt to reconnect
     try {
       await mongoose.connect();
-    } catch (err) {
-      mongoose.config.logger.error(err);
+    } catch (error) {
+      mongoose.config.logger.error(error);
     }
   };
 

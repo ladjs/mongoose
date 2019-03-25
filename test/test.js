@@ -1,4 +1,9 @@
 const test = require('ava');
 
-// eslint-disable-next-line ava/no-todo-test
-test.todo('add tests');
+const mongoose = require('..');
+
+test('connects', async t => {
+  mongoose.configure();
+  await mongoose.connect();
+  t.pass();
+});
