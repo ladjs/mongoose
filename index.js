@@ -81,9 +81,10 @@ mongoose.configure = config => {
 };
 
 mongoose._connect = mongoose.connect;
-mongoose.connect = async (uri, options) => {
-  uri = uri || mongoose.config.mongo.uri;
-  options = options || mongoose.config.mongo.options;
+mongoose.connect = async (
+  uri = mongoose.config.mongo.uri,
+  options = mongoose.config.mongo.options
+) => {
   try {
     await mongoose._connect(uri, options);
     // output debug info
