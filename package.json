@@ -16,9 +16,11 @@
     "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com)"
   ],
   "dependencies": {
+    "auto-bind": "^2.1.0",
     "boolean": "^1.0.0",
     "debug": "^4.1.1",
-    "delay": "^4.3.0"
+    "delay": "^4.3.0",
+    "lodash": "^4.17.15"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.1.0",
