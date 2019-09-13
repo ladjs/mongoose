@@ -19,7 +19,10 @@ test('attempts to reconnect 3 times', async t => {
         reconnectTries: 3,
         reconnectInterval: 100
       }
-    }
+    },
+    cloneSchemas: true
   });
+  t.is(mongoose.get('useCreateIndex'), true);
+  t.is(mongoose.get('cloneSchemas'), true);
   await t.throwsAsync(mongoose.connect);
 });
