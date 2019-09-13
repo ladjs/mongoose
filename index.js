@@ -1,6 +1,4 @@
 const _ = require('lodash');
-const autoBind = require('auto-bind');
-const boolean = require('boolean');
 const delay = require('delay');
 const mongoose = require('mongoose');
 
@@ -29,56 +27,70 @@ class Mongoose {
     this._connectionAttempts = 0;
 
     // <https://github.com/Automattic/mongoose/issues/8144>
-    // this._mongoose = new mongoose.Mongoose();
-
-    // if `useCreateIndex` was set as an option then use it
-    mongoose.set('useCreateIndex', boolean(this.config.useCreateIndex));
-
-    // set debug flag
-    mongoose.set('debug', boolean(this.config.debug));
-
-    // automatically bind this on methods
-    autoBind(this);
+    // <https://github.com/Automattic/mongoose/blob/61f698c4b39d95dd09643a7efdde0a51d07a8486/lib/index.js#L141>
+    this._mongoose = new mongoose.Mongoose(
+      _.pick(this.config, [
+        'debug',
+        'bufferCommands',
+        'useCreateIndex',
+        'useFindAndModify',
+        'useNewUrlParser',
+        'cloneSchemas',
+        'applyPluginsToDiscriminators',
+        'applyPluginsToChildSchemas',
+        'objectIdGetter',
+        'runValidators',
+        'toObject',
+        'toJSON',
+        'strict',
+        'selectPopulatedPaths',
+        'maxTimeMS'
+      ])
+    );
 
     //
     // connection events
     // <https://mongoosejs.com/docs/connections.html#connection-events>
     //
-    mongoose.connection.on('connecting', () =>
+    this._mongoose.connection.on('connecting', () =>
       this.config.logger.debug('mongoose connection connecting')
     );
-    mongoose.connection.on('connected', () =>
+    this._mongoose.connection.on('connected', () =>
       this.config.logger.debug('mongoose connection connected')
     );
-    mongoose.connection.on('disconnecting', () =>
+    this._mongoose.connection.on('disconnecting', () =>
       this.config.logger.debug('mongoose connection disconnecting')
     );
-    mongoose.connection.on('disconnected', () =>
+    this._mongoose.connection.on('disconnected', () =>
       this.config.logger.debug('mongoose connection disconnected')
     );
-    mongoose.connection.on('close', () =>
+    this._mongoose.connection.on('close', () =>
       this.config.logger.debug('mongoose connection closed')
     );
-    mongoose.connection.on('reconnected', () =>
+    this._mongoose.connection.on('reconnected', () =>
       this.config.logger.debug('mongoose connection reconnected')
     );
-    mongoose.connection.on('fullsetup', () =>
+    this._mongoose.connection.on('fullsetup', () =>
       this.config.logger.debug(
         'mongoose connection replica set connected to primary server and at least one secondary server'
       )
     );
-    mongoose.connection.on('all', () =>
+    this._mongoose.connection.on('all', () =>
       this.config.logger.debug(
         'mongoose connection replica set connected to all servers'
       )
     );
-    mongoose.connection.on('reconnectFailed', () =>
+    this._mongoose.connection.on('reconnectFailed', () =>
       this.config.logger.debug('mongoose connection reconnect failed')
     );
-    mongoose.connection.on('reconnectTries', () =>
+    this._mongoose.connection.on('reconnectTries', () =>
       this.config.logger.debug('mongoose connection reconnect tries exceeded')
     );
-    mongoose.connection.on('error', err => this.config.logger.error(err));
+    this._mongoose.connection.on('error', err => this.config.logger.error(err));
+
+    // bind this
+    this.connect = this.connect.bind(this);
+    this.disconnect = this.disconnect.bind(this);
   }
 
   async connect(
@@ -93,7 +105,7 @@ class Mongoose {
     // and we want to continually retry even a connection from the start
     //
     try {
-      await mongoose.connect(uri, options);
+      await this._mongoose.connect(uri, options);
       // reset the times we've tried to reconnect
       this._connectionAttempts = 0;
     } catch (err) {
@@ -113,12 +125,7 @@ class Mongoose {
   }
 
   async disconnect() {
-    try {
-      // attempt to disconnect
-      await mongoose.disconnect();
-    } catch (err) {
-      this.config.logger.error(err);
-    }
+    await this._mongoose.disconnect();
   }
 }
 
