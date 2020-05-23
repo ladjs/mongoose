@@ -20,9 +20,6 @@ class Mongoose {
       config
     );
 
-    if (!_.isString(this.config.mongo.uri))
-      throw new Error('Missing `mongo.uri` (String) connection URI');
-
     // store how many times we have attempted to connect/reconnect
     this._connectionAttempts = 0;
 
@@ -111,6 +108,11 @@ class Mongoose {
     // and we want to continually retry even a connection from the start
     //
     try {
+      if (!_.isString(uri))
+        throw new Error(
+          'Missing uri: pass a valid connection URI string as a parameter to `connect` or set the `mongo.uri` key in the mongoose constructor.'
+        );
+
       await mongoose.connect(uri, options);
       // reset the times we've tried to reconnect
       this._connectionAttempts = 0;
