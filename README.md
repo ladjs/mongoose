@@ -35,24 +35,19 @@ yarn add @ladjs/mongoose
 
 ## Usage
 
-This package serves as a drop-in replacement for a normal Mongoose `require()` call. It carries the same exact API and returns the same Mongoose instance that it normally would (except it adds some extra glue on top).
+This package creates a mongoose object which serves as a drop-in replacement for a normal Mongoose `require()` call. It carries the same exact API and returns the same Mongoose instance that it normally would (except it adds some extra glue on top).
 
-> Basic usage:
-
-```js
-const mongoose = require('@ladjs/mongoose');
-mongoose.configure();
-mongoose.connect().then().catch(console.error);
-```
-
-> Advanced usage:
+> Usage:
 
 ```js
-const mongoose = require('@ladjs/mongoose');
-mongoose.configure({
+const Mongoose = require('@ladjs/mongoose');
+const mongoose = new Mongoose({
   // ...
 });
-mongoose.connect().then().catch(console.error);
+mongoose
+  .connect()
+  .then()
+  .catch(console.error);
 ```
 
 
