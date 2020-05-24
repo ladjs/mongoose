@@ -57,7 +57,8 @@ class Mongoose {
       'toJSON',
       'strict',
       'selectPopulatedPaths',
-      'maxTimeMS'
+      'maxTimeMS',
+      'autoIndex'
     ]);
 
     for (const prop in options) {
