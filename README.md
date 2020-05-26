@@ -95,9 +95,10 @@ In mongoose 5.7 the mongo driver version was bumped which caused some deprecatio
 
 ## Contributors
 
-| Name           | Website                   |
-| -------------- | ------------------------- |
-| **Nick Baugh** | <http://niftylettuce.com> |
+| Name               | Website                   |
+| ------------------ | ------------------------- |
+| **Nick Baugh**     | <http://niftylettuce.com> |
+| **Spencer Snyder** | <http://spencersnyder.io> |
 
 
 ## License

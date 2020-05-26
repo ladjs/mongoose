@@ -13,7 +13,8 @@
     ]
   },
   "contributors": [
-    "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com)"
+    "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com)",
+    "Spencer Snyder <sasnyde2@gmail.com> (http://spencersnyder.io)"
   ],
   "dependencies": {
     "boolean": "^3.0.1",
