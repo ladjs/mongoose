@@ -46,6 +46,9 @@
   "engines": {
     "node": ">=12.x"
   },
+  "files": [
+    "index.js"
+  ],
   "homepage": "https://github.com/ladjs/mongoose",
   "keywords": [
     "agenda",
