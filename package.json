@@ -22,7 +22,7 @@
     "Spencer Snyder <sasnyde2@gmail.com> (http://spencersnyder.io)"
   ],
   "dependencies": {
-    "debug": "^4.3.2",
+    "debug": "^4.3.4",
     "delay": "^4.3.0",
     "lodash": "^4.17.21"
   },
