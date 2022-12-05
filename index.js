@@ -64,7 +64,7 @@ class Mongoose {
       'toObject'
     ];
 
-    for (const prop in options) {
+    for (const prop of options) {
       if (typeof this.config[prop] !== 'undefined')
         mongoose.set(prop, this.config[prop]);
     }
