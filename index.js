@@ -1,16 +1,19 @@
-const _ = require('lodash');
 const delay = require('delay');
 const mongoose = require('mongoose');
+const mergeOptions = require('merge-options');
 
 class Mongoose {
   constructor(config = {}) {
-    this.config = _.merge(
+    this.config = mergeOptions(
       {
         logger: console,
         debug: false,
         mongo: {},
         reconnectTries: Number.MAX_VALUE,
-        reconnectInterval: 1000
+        reconnectInterval: 1000,
+        hideMeta: 'hide_meta',
+        strict: true,
+        strictQuery: false
       },
       config
     );
@@ -29,29 +32,32 @@ class Mongoose {
     this._connectionAttempts = 0;
 
     // options from <https://mongoosejs.com/docs/api.html#mongoose_Mongoose-set>
-    const options = _.pick(this.config, [
+    const options = [
+      'applyPluginsToChildSchemas',
+      'applyPluginsToDiscriminators',
+      'autoCreate',
+      'autoIndex',
       'debug',
       'returnOriginal',
       'bufferCommands',
       'cloneSchemas',
-      'applyPluginsToDiscriminators',
-      'applyPluginsToChildSchemas',
+      'timestamps.createdAt.immutable',
+      'maxTimeMS',
       'objectIdGetter',
+      'overwriteModels',
+      'returnOriginal',
       'runValidators',
-      'toObject',
-      'toJSON',
+      'sanitizeFilter',
+      'selectPopulatedPaths',
       'strict',
       'strictQuery',
-      'selectPopulatedPaths',
-      'maxTimeMS',
-      'autoIndex',
-      'autoCreate',
-      'overwriteModels'
-    ]);
+      'toJSON',
+      'toObject'
+    ];
 
     for (const prop in options) {
-      if (Object.hasOwnProperty.call(options, prop))
-        mongoose.set(prop, options[prop]);
+      if (typeof this.config[prop] !== 'undefined')
+        mongoose.set(prop, this.config[prop]);
     }
 
     //
@@ -109,7 +115,7 @@ class Mongoose {
     // (e.g. connections are only reconnected after already established)
     // and we want to continually retry even a connection from the start.
     try {
-      if (!_.isString(uri))
+      if (typeof uri !== 'string')
         throw new Error(
           'Missing uri: pass a valid connection URI string as a parameter to `connect` or set the `mongo.uri` key in the mongoose constructor.'
         );

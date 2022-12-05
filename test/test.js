@@ -4,9 +4,9 @@ const Mongoose = require('..');
 
 // suppress logging for tests
 const logger = {
-  debug: () => {},
-  error: () => {},
-  warn: () => {}
+  debug() {},
+  error() {},
+  warn() {}
 };
 
 test.before(async (t) => {

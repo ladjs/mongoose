@@ -22,29 +22,27 @@
     "Spencer Snyder <sasnyde2@gmail.com> (http://spencersnyder.io)"
   ],
   "dependencies": {
-    "debug": "^4.3.2",
-    "delay": "^4.3.0",
-    "lodash": "^4.17.21"
+    "delay": "^5.0.0",
+    "merge-options": "^3.0.4"
   },
   "devDependencies": {
-    "@commitlint/cli": "^13.2.1",
-    "@commitlint/config-conventional": "^13.2.0",
-    "ava": "^3.15.0",
-    "codecov": "^3.8.3",
+    "@commitlint/cli": "^17.3.0",
+    "@commitlint/config-conventional": "^17.3.0",
+    "ava": "^5.1.0",
     "cross-env": "^7.0.3",
-    "eslint-config-xo-lass": "^1.0.3",
+    "eslint-config-xo-lass": "^2.0.1",
     "fixpack": "^4.0.0",
-    "husky": "^7.0.4",
-    "lint-staged": "^11.2.4",
-    "mongodb-memory-server": "^7.5.1",
-    "mongoose": "^6.0.12",
+    "husky": "^8.0.2",
+    "lint-staged": "^13.1.0",
+    "mongodb-memory-server": "^8.10.1",
+    "mongoose": "^6.8.0",
     "nyc": "^15.1.0",
-    "remark-cli": "^9",
-    "remark-preset-github": "^4.0.1",
-    "xo": "^0.45.0"
+    "remark-cli": "^11.0.0",
+    "remark-preset-github": "^4.0.4",
+    "xo": "^0.53.1"
   },
   "engines": {
-    "node": ">=12.x"
+    "node": ">=14"
   },
   "files": [
     "index.js"
@@ -75,36 +73,14 @@
   "peerDependencies": {
     "mongoose": ">=6"
   },
-  "prettier": {
-    "singleQuote": true,
-    "bracketSpacing": true,
-    "trailingComma": "none"
-  },
-  "remarkConfig": {
-    "plugins": [
-      "preset-github"
-    ]
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ladjs/mongoose"
   },
   "scripts": {
-    "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
-    "lint": "xo && remark . -qfo",
-    "precommit": "lint-staged && npm test",
+    "lint": "xo --fix && remark . -qfo && fixpack",
     "prepare": "husky install",
-    "test": "npm run lint && npm run test-coverage",
-    "test-coverage": "cross-env NODE_ENV=test nyc ava"
-  },
-  "xo": {
-    "prettier": true,
-    "space": true,
-    "extends": [
-      "xo-lass"
-    ],
-    "rules": {
-      "unicorn/prefer-module": "off"
-    }
+    "pretest": "npm run lint",
+    "test": "cross-env NODE_ENV=test nyc ava"
   }
 }
