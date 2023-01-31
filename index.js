@@ -1,5 +1,3 @@
-const EventEmitter = require('node:events');
-
 const mongoose = require('mongoose');
 const mergeOptions = require('merge-options');
 
@@ -67,120 +65,97 @@ class Mongoose {
     }
 
     // bind this
-    this.connect = this.connect.bind(this);
-    this.disconnect = this.disconnect.bind(this);
+    this.createConnection = this.createConnection.bind(this);
   }
 
-  async connect(
+  createConnection(
     uri = this.config.mongo.uri,
     options = this.config.mongo.options
   ) {
     //
-    // unbind events if `this.connection` already existed
-    //
-    if (this.connection && this.connection instanceof EventEmitter) {
-      this.connection.removeAllListeners('connecting');
-      this.connection.removeAllListeners('connected');
-      this.connection.removeAllListeners('disconnecting');
-      this.connection.removeAllListeners('disconnected');
-      this.connection.removeAllListeners('close');
-      this.connection.removeAllListeners('reconnected');
-      this.connection.removeAllListeners('fullsetup');
-      this.connection.removeAllListeners('all');
-      this.connection.removeAllListeners('reconnectFailed');
-      this.connection.removeAllListeners('reconnectTries');
-      this.connection.removeAllListeners('error');
-    }
-
-    //
     // create connection
     //
-    this.connection = await mongoose.createConnection(uri, options);
+    const connection = mongoose.createConnection(uri, options);
 
     //
     // bind connection events
     // <https://mongoosejs.com/docs/connections.html#connection-events>
     //
     if (this.config.bindEvents) {
-      this.connection.on('connecting', () =>
+      connection.on('connecting', () =>
         log(
           this.config.logger.debug,
           'mongoose connection connecting',
           this.config.hideMeta
         )
       );
-      this.connection.on('connected', () =>
+      connection.on('connected', () =>
         log(
           this.config.logger.debug,
           'mongoose connection connected',
           this.config.hideMeta
         )
       );
-      this.connection.on('disconnecting', () =>
+      connection.on('disconnecting', () =>
         log(
           this.config.logger.debug,
           'mongoose connection disconnecting',
           this.config.hideMeta
         )
       );
-      this.connection.on('disconnected', () => {
+      connection.on('disconnected', () => {
         log(
           this.config.logger.debug,
           'mongoose connection disconnected',
           this.config.hideMeta
         );
       });
-      this.connection.on('close', () =>
+      connection.on('close', () =>
         log(
           this.config.logger.debug,
           'mongoose connection closed',
           this.config.hideMeta
         )
       );
-      this.connection.on('reconnected', () =>
+      connection.on('reconnected', () =>
         log(
           this.config.logger.debug,
           'mongoose connection reconnected',
           this.config.hideMeta
         )
       );
-      this.connection.on('fullsetup', () =>
+      connection.on('fullsetup', () =>
         log(
           this.config.logger.debug,
           'mongoose connection replica set connected to primary server and at least one secondary server',
           this.config.hideMeta
         )
       );
-      this.connection.on('all', () =>
+      connection.on('all', () =>
         log(
           this.config.logger.debug,
           'mongoose connection replica set connected to all servers',
           this.config.hideMeta
         )
       );
-      this.connection.on('reconnectFailed', () =>
+      connection.on('reconnectFailed', () =>
         log(
           this.config.logger.error,
           'mongoose connection reconnect failed',
           this.config.hideMeta
         )
       );
-      this.connection.on('reconnectTries', () =>
+      connection.on('reconnectTries', () =>
         log(
           this.config.logger.error,
           'mongoose connection reconnect tries exceeded',
           this.config.hideMeta
         )
       );
-      this.connection.on('error', (err) => this.config.logger.error(err));
+      connection.on('error', (err) => this.config.logger.error(err));
     }
 
-    return this.connection.asPromise();
-  }
-
-  async disconnect() {
-    if (this.connection && this.connection.close)
-      return this.connection.close();
+    return connection;
   }
 }
 

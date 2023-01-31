@@ -36,14 +36,14 @@ const Mongoose = require('@ladjs/mongoose');
 const { Schema } = require('mongoose');
 
 (async () => {
-  const mongoose = new Mongoose({
+  const m = new Mongoose({
     mongo: {
       options: { heartbeatFrequencyMS: 100, serverSelectionTimeoutMS: 1000 }
     }
   });
 
-  const conn1 = await mongoose.connect('mongodb://server-one.example.com/database-name');
-  const conn2 = await mongoose.connect('mongodb://server-two.example.com/database-name');
+  const conn1 = await m.createConnection('mongodb://server-one.example.com/database-name').asPromise();
+  const conn2 = await m.createConnection('mongodb://server-two.example.com/database-name').asPromise();
 
   const UserSchema = new Schema({ name: String });
   const LogSchema = new Schema({ name: String });
@@ -59,7 +59,7 @@ const { Schema } = require('mongoose');
 })();
 ```
 
-Note that instances of this class `Mongoose` only have the method `connect` and `disconnect`.  It is not 1:1 with `mongoose` normal singleton.
+Note that instances of this class `Mongoose` only have the method `createConnection`.  It is not 1:1 with `mongoose` normal singleton.
 
 You should use [@ladjs/graceful][lad-graceful] to manage process SIGHUP and graceful exits.
 

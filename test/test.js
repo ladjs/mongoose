@@ -21,28 +21,28 @@ test.after(async (t) => {
   await t.context.mongod.stop();
 });
 
-test('connects and disconnects', async (t) => {
-  const mongoose = new Mongoose({
+test('connects', async (t) => {
+  const m = new Mongoose({
     logger,
     mongo: {
       uri: t.context.uri
     }
   });
-  await t.notThrowsAsync(() => mongoose.connect());
-  await t.notThrowsAsync(() => mongoose.disconnect());
+  await t.notThrowsAsync(() => m.createConnection().asPromise());
   t.pass();
 });
 
 test('uses custom specified', async (t) => {
-  const mongoose = new Mongoose({ logger });
-  await t.notThrowsAsync(() => mongoose.connect('mongodb://localhost'));
-  await t.notThrowsAsync(() => mongoose.disconnect());
+  const m = new Mongoose({ logger });
+  await t.notThrowsAsync(() =>
+    m.createConnection('mongodb://localhost').asPromise()
+  );
   t.pass();
 });
 
 test('errors without uri', async (t) => {
-  const mongoose = new Mongoose({ logger });
-  const err = await t.throwsAsync(() => mongoose.connect());
+  const m = new Mongoose({ logger });
+  const err = await t.throws(() => m.createConnection());
   t.is(
     err.message,
     'The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.'
@@ -59,39 +59,37 @@ if (process.platform === 'darwin') {
     t.timeout(Number.MAX_VALUE);
     await exec('brew services start mongodb-community@4.4');
     await delay(3000);
-    const mongoose = new Mongoose({
+    const m = new Mongoose({
       logger,
       mongo: {
         options: { heartbeatFrequencyMS: 100, serverSelectionTimeoutMS: 1000 }
       }
     });
-    await t.notThrowsAsync(() => mongoose.connect('mongodb://localhost'));
+    const conn = m.createConnection('mongodb://localhost');
+    await t.notThrowsAsync(() => conn.asPromise());
     await delay(1000);
-    t.is(mongoose.connection.readyState, 1);
-    const MyModel = mongoose.connection.model(
-      'Test',
-      new Schema({ name: String })
-    );
+    t.is(conn.readyState, 1);
+    const MyModel = conn.model('Test', new Schema({ name: String }));
     await exec('brew services stop mongodb-community@4.4');
     await delay(1000);
-    t.is(mongoose.connection.readyState, 0);
+    t.is(conn.readyState, 0);
     const err = await t.throwsAsync(() => MyModel.findOne());
     t.is(err.name, 'MongooseServerSelectionError');
     await exec('brew services start mongodb-community@4.4');
     await delay(5000);
     await t.notThrowsAsync(() => MyModel.findOne());
-    t.is(mongoose.connection.readyState, 1);
+    t.is(conn.readyState, 1);
   });
 }
 
 test('errors with bad connection string', async (t) => {
-  const mongoose = new Mongoose({
+  const m = new Mongoose({
     logger,
     mongo: {
       uri: 'some/bad/connection/string'
     }
   });
-  const err = await t.throwsAsync(() => mongoose.connect());
+  const err = await t.throwsAsync(() => m.createConnection().asPromise());
   t.is(
     err.message,
     'Invalid scheme, expected connection string to start with "mongodb://" or "mongodb+srv://"'
@@ -103,9 +101,9 @@ test('supports writing to separate databases', async (t) => {
   const mongod2 = await MongoMemoryServer.create();
   const uri1 = mongod1.getUri();
   const uri2 = mongod2.getUri();
-  const mongoose = new Mongoose({ logger });
-  const conn1 = await mongoose.connect(uri1);
-  const conn2 = await mongoose.connect(uri2);
+  const m = new Mongoose({ logger });
+  const conn1 = await m.createConnection(uri1).asPromise();
+  const conn2 = await m.createConnection(uri2).asPromise();
   const schema = new Schema({ name: String });
   const Users = conn1.model('Users', schema);
   const Logs = conn2.model('Logs', schema);
