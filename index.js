@@ -93,8 +93,14 @@ class Mongoose {
     // <https://github.com/Automattic/mongoose/issues/12970>
     //
     connection.asPromise = function () {
-      if (!this.$initialConnection)
-        return this.openUri(this._connectionString, this._connectionOptions);
+      if (
+        !this.$initialConnection ||
+        this.readyState === mongoose.ConnectionStates.disconnected
+      )
+        this.$initialConnection = this.openUri(
+          this._connectionString,
+          this._connectionOptions
+        );
       return this.$initialConnection;
     };
 
