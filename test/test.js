@@ -32,14 +32,6 @@ test('connects', async (t) => {
   t.pass();
 });
 
-test('uses custom specified', async (t) => {
-  const m = new Mongoose({ logger });
-  await t.notThrowsAsync(() =>
-    m.createConnection('mongodb://localhost').asPromise()
-  );
-  t.pass();
-});
-
 test('errors without uri', async (t) => {
   const m = new Mongoose({ logger });
   const err = await t.throws(() => m.createConnection());
