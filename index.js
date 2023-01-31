@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const mergeOptions = require('merge-options');
 
+const Connection = require('mongoose/lib/connection');
+
 function log(fn, message, hideMeta) {
   if (hideMeta) fn(message, { [hideMeta]: true });
   else fn(message);
@@ -80,7 +82,24 @@ class Mongoose {
     //
     // create connection
     //
-    const connection = mongoose.createConnection(uri, options);
+
+    // <https://github.com/Automattic/mongoose/issues/12970>
+    const connection = new Connection(mongoose);
+    connection._connectionString = uri;
+    connection._connectionOptions = options;
+
+    //
+    // hacky approach so that `openUri` is not called immediately
+    // <https://github.com/Automattic/mongoose/issues/12970>
+    //
+    connection.asPromise = function () {
+      if (!this.$initialConnection)
+        return this.openUri(this._connectionString, this._connectionOptions);
+      return this.$initialConnection;
+    };
+
+    mongoose.connections.push(connection);
+    mongoose.events.emit('createConnection', connection);
 
     //
     // bind connection events

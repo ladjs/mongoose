@@ -34,7 +34,7 @@ test('connects', async (t) => {
 
 test('errors without uri', async (t) => {
   const m = new Mongoose({ logger });
-  const err = await t.throws(() => m.createConnection());
+  const err = await t.throws(() => m.createConnection().asPromise());
   t.is(
     err.message,
     'The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.'
