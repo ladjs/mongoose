@@ -20,8 +20,7 @@ class Mongoose {
           }
         },
         strict: true,
-        strictQuery: false,
-        bufferCommands: false
+        strictQuery: false
       },
       config
     );
