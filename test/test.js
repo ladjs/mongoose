@@ -50,8 +50,29 @@ test('errors without uri', async (t) => {
 });
 
 // <https://github.com/Automattic/mongoose/issues/12961>
-// eslint-disable-next-line ava/no-todo-test
-test.todo('creates, stops, and retries connection with mongodb-memory-server');
+test('creates, stops, and retries connection with mongodb-memory-server', async (t) => {
+  const mongod = await MongoMemoryServer.create();
+  const uri = mongod.getUri();
+  const m = new Mongoose({
+    logger,
+    mongo: {
+      options: { heartbeatFrequencyMS: 100, serverSelectionTimeoutMS: 1000 }
+    }
+  });
+  t.is(mongod.state, 'running');
+  const conn = m.createConnection(uri);
+  await t.notThrowsAsync(() => conn.asPromise());
+  await delay(500);
+  t.is(conn.readyState, 1);
+  await mongod.stop({ doCleanup: false });
+  t.is(mongod.state, 'stopped');
+  await delay(500);
+  t.is(conn.readyState, 0);
+  await mongod.start(true);
+  t.is(mongod.state, 'running');
+  await delay(500);
+  t.is(conn.readyState, 1);
+});
 
 // <https://github.com/Automattic/mongoose/issues/12962>
 if (process.platform === 'darwin') {
