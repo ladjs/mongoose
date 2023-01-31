@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 const mergeOptions = require('merge-options');
 
-const Connection = require('mongoose/lib/connection');
+//
+// NOTE: we have to use NativeConnection instead of MongooseConnection due to doClose not being exposed
+//
+const Connection = require('mongoose/lib/drivers/node-mongodb-native/connection');
 
 function log(fn, message, hideMeta) {
   if (hideMeta) fn(message, { [hideMeta]: true });
