@@ -1,16 +1,11 @@
 {
   "name": "@ladjs/mongoose",
-  "description": "Mongoose helper for Lad",
+  "description": "Mongoose helper for Lad, which is used as an alternative to the default `mongoose.connect()` for multiple connection management.  See the Forward Email codebase for further insight into setup.",
   "version": "4.0.2",
   "author": "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com)",
   "bugs": {
     "url": "https://github.com/ladjs/mongoose/issues",
     "email": "niftylettuce@gmail.com"
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
   },
   "config": {
     "mongodbMemoryServer": {
@@ -22,23 +17,24 @@
     "Spencer Snyder <sasnyde2@gmail.com> (http://spencersnyder.io)"
   ],
   "dependencies": {
-    "delay": "^5.0.0",
     "merge-options": "^3.0.4"
   },
   "devDependencies": {
-    "@commitlint/cli": "^17.3.0",
-    "@commitlint/config-conventional": "^17.3.0",
-    "ava": "^5.1.0",
+    "@commitlint/cli": "^17.4.2",
+    "@commitlint/config-conventional": "^17.4.2",
+    "ava": "^5.1.1",
     "cross-env": "^7.0.3",
+    "delay": "^5.0.0",
     "eslint-config-xo-lass": "^2.0.1",
     "fixpack": "^4.0.0",
-    "husky": "^8.0.2",
+    "husky": "^8.0.3",
     "lint-staged": "^13.1.0",
-    "mongodb-memory-server": "^8.10.1",
-    "mongoose": "^6.8.0",
+    "mongodb-memory-server": "^8.11.4",
+    "mongoose": "^6.9.0",
     "nyc": "^15.1.0",
     "remark-cli": "^11.0.0",
     "remark-preset-github": "^4.0.4",
+    "signale": "^1.4.0",
     "xo": "^0.53.1"
   },
   "engines": {
@@ -55,20 +51,6 @@
     "mongoose"
   ],
   "license": "MIT",
-  "lint-staged": {
-    "*.js": [
-      "xo --fix",
-      "git add"
-    ],
-    "*.md": [
-      "remark . -qfo",
-      "git add"
-    ],
-    "package.json": [
-      "fixpack",
-      "git add"
-    ]
-  },
   "main": "index.js",
   "peerDependencies": {
     "mongoose": ">=6"
