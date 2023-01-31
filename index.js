@@ -13,7 +13,12 @@ class Mongoose {
         logger: console,
         hideMeta: 'hide_meta',
         bindEvents: true,
-        mongo: {},
+        mongo: {
+          options: {
+            serverSelectionTimeoutMS: 9000,
+            heartbeatFrequencyMS: 3000
+          }
+        },
         strict: true,
         strictQuery: false
       },
