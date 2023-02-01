@@ -1,7 +1,8 @@
 const process = require('node:process');
 
-const mongoose = require('mongoose');
 const mergeOptions = require('merge-options');
+const mongoose = require('mongoose');
+const { boolean } = require('boolean');
 
 //
 // NOTE: we have to use NativeConnection instead of MongooseConnection due to doClose not being exposed
@@ -26,6 +27,7 @@ class Mongoose {
             heartbeatFrequencyMS: 3000
           }
         },
+        debug: boolean(process.env.MONGOOSE_DEBUG),
         strict: true,
         strictQuery: false
       },
