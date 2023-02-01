@@ -1,3 +1,5 @@
+const process = require('node:process');
+
 const mongoose = require('mongoose');
 const mergeOptions = require('merge-options');
 
@@ -16,7 +18,7 @@ class Mongoose {
     this.config = mergeOptions(
       {
         logger: console,
-        hideMeta: 'hide_meta',
+        hideMeta: process.env.NODE_ENV === 'test' ? false : 'hide_meta',
         bindEvents: true,
         mongo: {
           options: {
@@ -37,12 +39,6 @@ class Mongoose {
       throw new Error(
         'mongoose peer dependency > 6 required.\nnpm install mongoose@6'
       );
-
-    log(
-      this.config.logger.debug,
-      `using mongoose v${this._mongooseVersion}`,
-      this.config.hideMeta
-    );
 
     // options from <https://mongoosejs.com/docs/api.html#mongoose_Mongoose-set>
     const options = [
@@ -118,70 +114,70 @@ class Mongoose {
       connection.on('connecting', () =>
         log(
           this.config.logger.debug,
-          'mongoose connection connecting',
+          `Mongoose connection #${connection.id} connecting.`,
           this.config.hideMeta
         )
       );
       connection.on('connected', () =>
         log(
           this.config.logger.debug,
-          'mongoose connection connected',
+          `Mongoose connection #${connection.id} connected to: ${connection.host}:${connection.port}/${connection.name}`,
           this.config.hideMeta
         )
       );
       connection.on('disconnecting', () =>
         log(
           this.config.logger.debug,
-          'mongoose connection disconnecting',
+          `Mongoose connection #${connection.id} disconnecting from: ${connection.host}:${connection.port}/${connection.name}`,
           this.config.hideMeta
         )
       );
       connection.on('disconnected', () => {
         log(
           this.config.logger.debug,
-          'mongoose connection disconnected',
+          `Mongoose connection #${connection.id} disconnected.`,
           this.config.hideMeta
         );
       });
       connection.on('close', () =>
         log(
           this.config.logger.debug,
-          'mongoose connection closed',
+          `Mongoose connection #${connection.id} closed.`,
           this.config.hideMeta
         )
       );
       connection.on('reconnected', () =>
         log(
           this.config.logger.debug,
-          'mongoose connection reconnected',
+          `Mongoose connection #${connection.id} reconnected to: ${connection.host}:${connection.port}/${connection.name}`,
           this.config.hideMeta
         )
       );
       connection.on('fullsetup', () =>
         log(
           this.config.logger.debug,
-          'mongoose connection replica set connected to primary server and at least one secondary server',
+          `Mongoose connection #${connection.id} full setup with replica set primary and at least one secondary.`,
           this.config.hideMeta
         )
       );
       connection.on('all', () =>
         log(
           this.config.logger.debug,
-          'mongoose connection replica set connected to all servers',
+          `Mongoose connection #${connection.id} replica set connected to all servers.`,
           this.config.hideMeta
         )
       );
       connection.on('reconnectFailed', () =>
         log(
           this.config.logger.error,
-          'mongoose connection reconnect failed',
+          `Mongoose connection #${connection.id} reconnect failed to: ${connection.host}:${connection.port}/${connection.name}`,
           this.config.hideMeta
         )
       );
       connection.on('reconnectTries', () =>
         log(
           this.config.logger.error,
-          'mongoose connection reconnect tries exceeded',
+          `Mongoose connection #${connection.id} reconnect tries exceeded to: ${connection.host}:${connection.port}/${connection.name}`,
           this.config.hideMeta
         )
       );
