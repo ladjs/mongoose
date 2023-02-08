@@ -1,7 +1,7 @@
 {
   "name": "@ladjs/mongoose",
   "description": "Mongoose helper for Lad, which is used as an alternative to the default `mongoose.connect()` for multiple connection management.  See the Forward Email codebase for further insight into setup.",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "author": "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com)",
   "bugs": {
     "url": "https://github.com/ladjs/mongoose/issues",
