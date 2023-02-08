@@ -30,7 +30,7 @@ class Mongoose {
         debug: boolean(process.env.MONGOOSE_DEBUG),
         strict: true,
         strictQuery: false,
-        maxTimeMS: 5000 // default 5s timeout for a query to complete
+        maxTimeMS: 10000 // default 10s timeout for a query to complete
       },
       config
     );
