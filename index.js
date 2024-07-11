@@ -1,5 +1,4 @@
 const process = require('node:process');
-
 const mergeOptions = require('merge-options');
 const mongoose = require('mongoose');
 const { boolean } = require('boolean');
@@ -23,14 +22,15 @@ class Mongoose {
         bindEvents: true,
         mongo: {
           options: {
-            serverSelectionTimeoutMS: 30000, // default is 30s
-            heartbeatFrequencyMS: 10000 // default is 10s
+            serverSelectionTimeoutMS:
+              process.env.NODE_ENV === 'test' ? 9000 : 30000, // default is 30s
+            heartbeatFrequencyMS: process.env.NODE_ENV === 'test' ? 3000 : 10000 // default is 10s
           }
         },
         debug: boolean(process.env.MONGOOSE_DEBUG),
         strict: true,
         strictQuery: false,
-        maxTimeMS: 30000 // default 30s timeout for a query to complete
+        maxTimeMS: process.env.NODE_ENV === 'test' ? 10000 : 30000 // default 30s timeout for a query to complete
       },
       config
     );
@@ -69,7 +69,7 @@ class Mongoose {
     ];
 
     for (const prop of options) {
-      if (typeof this.config[prop] !== 'undefined')
+      if (this.config[prop] !== undefined)
         mongoose.set(prop, this.config[prop]);
     }
 

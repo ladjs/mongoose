@@ -70,7 +70,7 @@ test('creates, stops, and retries connection with mongodb-memory-server', async 
 if (process.platform === 'darwin') {
   test('reconnects with mongodb', async (t) => {
     t.timeout(Number.MAX_VALUE);
-    await exec('brew services start mongodb-community@4.4');
+    await exec('brew services start mongodb-community');
     await delay(3000);
     const m = new Mongoose({
       logger,
@@ -83,12 +83,12 @@ if (process.platform === 'darwin') {
     await delay(1000);
     t.is(conn.readyState, 1);
     const MyModel = conn.model('Test', new Schema({ name: String }));
-    await exec('brew services stop mongodb-community@4.4');
+    await exec('brew services stop mongodb-community');
     await delay(1000);
     t.is(conn.readyState, 0);
     const err = await t.throwsAsync(() => MyModel.findOne());
     t.is(err.name, 'MongooseServerSelectionError');
-    await exec('brew services start mongodb-community@4.4');
+    await exec('brew services start mongodb-community');
     await delay(5000);
     await t.notThrowsAsync(() => MyModel.findOne());
     t.is(conn.readyState, 1);
