@@ -23,14 +23,14 @@ class Mongoose {
         bindEvents: true,
         mongo: {
           options: {
-            serverSelectionTimeoutMS: 9000,
-            heartbeatFrequencyMS: 3000
+            serverSelectionTimeoutMS: 30000, // default is 30s
+            heartbeatFrequencyMS: 10000 // default is 10s
           }
         },
         debug: boolean(process.env.MONGOOSE_DEBUG),
         strict: true,
         strictQuery: false,
-        maxTimeMS: 10000 // default 10s timeout for a query to complete
+        maxTimeMS: 30000 // default 30s timeout for a query to complete
       },
       config
     );
